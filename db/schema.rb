@@ -11,9 +11,12 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "appointments", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "doctor_id"
+    t.bigint "user_id"
+    t.bigint "doctor_id"
     t.datetime "appointment_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -28,8 +31,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
   end
 
   create_table "books_users", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "book_id"
+    t.bigint "user_id"
+    t.bigint "book_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["book_id"], name: "index_books_users_on_book_id"
@@ -52,7 +55,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
   end
 
   create_table "information", force: :cascade do |t|
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "mobile_number"
     t.string "address"
     t.datetime "created_at", null: false
@@ -61,7 +64,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
   end
 
   create_table "passports", force: :cascade do |t|
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "identification"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -70,8 +73,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
   end
 
   create_table "product_sizes", force: :cascade do |t|
-    t.integer "product_id"
-    t.integer "size", limit: 1
+    t.bigint "product_id"
+    t.integer "size", limit: 2
     t.integer "waist", limit: 2
     t.integer "chest", limit: 2
     t.datetime "created_at", null: false
@@ -84,7 +87,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_071127) do
     t.string "description"
     t.json "specifications"
     t.integer "inventory"
-    t.integer "status", limit: 1, default: 0
+    t.integer "status", limit: 2, default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
