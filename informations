@@ -1,0 +1,258 @@
+eksctl create cluster \
+  --name inxCluster \
+  --region ap-south-1 \
+  --nodegroup-name inxClusterNodeGroup \
+  --node-type m5.large \
+  --nodes 1 \
+  --nodes-min 1 \
+  --nodes-max 5 \
+  --ssh-public-key ~/.ssh/id_ed25519.pub \
+  --managed
+
+
+docker build --platform linux/x86_64 -t snm:v1 .
+docker tag snm:v1 snmmaurya/snm:v1
+docker push snmmaurya/snm:v1
+
+docker build --platform linux/x86_64 -t snm:v2 .
+docker tag snm:v2 snmmaurya/snm:v2
+docker push snmmaurya/snm:v2
+
+docker build --platform linux/x86_64 -t snm:v3 .
+docker tag snm:v3 snmmaurya/snm:v3
+docker push snmmaurya/snm:v3
+
+docker build --platform linux/x86_64 -t snm:v7 .
+docker tag snm:v6 snmmaurya/snm:v6
+docker push snmmaurya/snm:v6
+
+docker build --platform linux/x86_64 -t snm:v7 .
+docker tag snm:v7 snmmaurya/snm:v7
+docker push snmmaurya/snm:v7
+
+username: <%= ENV['DB_USERNAME'] %>
+password: <%= ENV['DB_PASSWORD'] %>
+host: <%= ENV['DB_HOST'] %>
+database: <%= ENV['DB_NAME'] %>
+
+ALTER USER inx PASSWORD 'Inx#147#!!!';
+
+Secret Manager
+create - rds-creds
+DB_USERNAME: inx
+DB_PASSWORD: Inx#147#!!!
+DB_HOST: inx.cpskua0y8h98.ap-south-1.rds.amazonaws.com
+DB_NAME: inx
+
+
+rails generate sidekiq:worker InxWorker
+
+Set up Sidekiq as the Rails background job processor
+# config/application.rb
+config.active_job.queue_adapter = :sidekiq
+
+InxWorker.perform_async(10, 20, 30)
+
+
+kubectl create secret generic sidekiq-creds \
+  --from-literal=SIDEKIQ_USERNAME=inx \
+  --from-literal=SIDEKIQ_PASSWORD=Inx147 \
+  -n inxns
+
+
+kubectl get secret sidekiq-creds -n inxns -o yaml
+echo 'aW54' | base64 --decode
+echo 'SW54MTQ3' | base64 --decode
+
+
+kubectl delete secret sidekiq-creds -n inxns
+kubectl get secret sidekiq-creds -n inxns -o jsonpath="{.data.SIDEKIQ_USERNAME}" | base64 --decode
+# Get all the keys in the secret
+kubectl get secret sidekiq-creds -n inxns -o jsonpath="{.data}" | jq 'to_entries[] | "\(.key): \(.value | @base64d)"'
+
+kubectl create namespace inxns
+kubectl label namespace inxns istio-injection=enabled
+
+kubectl delete pods --all -n default
+kubectl delete deployments --all -n default
+kubectl delete rs --all -n default
+kubectl delete svc --all -n default
+
+kubectl describe pod snm-6649b8868-stxxg -n inxns
+
+kubectl exec -it snm-7bfb85d79f-rxgq2 -n inxns
+kubectl describe pod snm-6649b8868-9wvtm -n inxns
+
+kubectl logs snm-979d657fd-dcflx -n inxns
+aws secretsmanager get-secret-value --secret-id rds-creds --query SecretString --output text
+{"DB_USERNAME":"inx","DB_PASSWORD":"Inx#147#!!!","DB_HOST":"inx.cpskua0y8h98.ap-south-1.rds.amazonaws.com","DB_NAME":"inx"}
+
+kubectl create secret generic rds-creds \
+  --from-literal=DB_USERNAME=inx \
+  --from-literal=DB_PASSWORD='Inx#147#!!!' \
+  --from-literal=DB_HOST=inx.cpskua0y8h98.ap-south-1.rds.amazonaws.com \
+  --from-literal=DB_NAME=inx \
+  -n inxns
+
+kubectl get secret rds-creds -n inxns -o jsonpath="{.data}" | jq 'to_entries[] | "\(.key): \(.value | @base64d)"'
+
+
+kubectl delete -f rails-deployment.yaml
+kubectl delete -f rails-service.yaml
+kubectl delete -f rails-gateway.yaml
+kubectl delete -f rails-vs.yaml
+kubectl delete -f redis-deployment.yaml
+kubectl delete -f redis-service.yaml
+kubectl delete -f sidekiq-deployment.yaml
+kubectl delete -f sidekiq-service.yaml
+kubectl delete -f sidekiq-gateway.yaml
+kubectl delete -f sidekiq-vs.yaml
+
+kubectl apply -f rails-deployment.yaml
+kubectl apply -f rails-service.yaml
+kubectl apply -f rails-gateway.yaml
+kubectl apply -f rails-vs.yaml
+kubectl apply -f redis-deployment.yaml
+kubectl apply -f redis-service.yaml
+kubectl apply -f sidekiq-deployment.yaml
+kubectl apply -f sidekiq-service.yaml
+kubectl apply -f sidekiq-gateway.yaml
+kubectl apply -f sidekiq-vs.yaml
+
+kubectl apply -f rails-migration-job.yaml
+
+kubectl apply -f sidekiq-hpa.yaml
+kubectl apply -f rails-hpa.yaml
+
+kubectl get all -n inxns
+kubectl get pods -n inxns
+
+kubectl logs rails-migration-job-d4thp -n inxns -f
+
+
+kubectl logs snm-deployment-565cdc6489-r6rhl -n inxns
+kubectl get service -n istio-system istio-ingressgateway
+
+
+kubectl logs cluster-autoscaler-94c966594-lfv7s -n kube-system
+kubectl get pods -n istio-system
+VPC PEERING - FOR DB Connection
+Update the Route Tables of both VPCs to allow traffic to flow between them:
+Go to the Route Tables section of the VPC console.
+Select the Route Table associated with the subnets in the EKS VPC.
+Add a route where the Destination is the CIDR block of the RDS VPC and the Target is the VPC Peering Connection.
+
+Do the same for the Route Table of the RDS VPC, adding a route where the Destination is the CIDR block of the EKS VPC.
+
+Step 3: Modify Security Groups
+Update the RDS Security Group:
+
+Go to the EC2 Console and select Security Groups.
+Find the security group attached to your RDS instance.
+Add an Inbound Rule that allows traffic from the CIDR block of the EKS VPC on the database port (e.g., 5432 for PostgreSQL, 3306 for MySQL).
+
+
+rails-master-key-creds
+
+kubectl create secret generic rails-master-key-creds \
+  --from-literal=RAILS_MASTER_KEY=b7fe684cbfff33c687aa48b707a0c520 \
+  -n inxns
+
+kubectl get secret rails-master-key-creds -n inxns -o jsonpath="{.data.RAILS_MASTER_KEY}" | base64 --decode
+
+
+kubectl rollout restart deployment snm -n inxns
+
+
+kubectl create -f rails-deployment.yaml
+kubectl delete -f rails-deployment.yaml
+
+kubectl exec -it snm-7bfb85d79f-rxgq2 -n inxns
+kubectl describe pod snm-6649b8868-9wvtm -n inxns
+
+kubectl exec -it snm-74467f96cf-l254r -n inxns -- /bin/bash
+
+kubectl exec -it snm-74467f96cf-l254r -n inxns -c snm -- /bin/bash
+
+kubectl create -f sidekiq-deployment.yaml
+kubectl delete -f sidekiq-deployment.yaml
+kubectl get pods -n inxns
+kubectl logs sidekiq-deployment-7f764f6fb7-bl5ck -n inxns
+
+
+rm config/master.key
+rm config/credentials/production.yml.enc
+lsof -wni tcp:3000
+
+
+
+create EKSClusterAutoscalerCustomPolicy
+
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+Automatically Cluster Autoscale
+
+kubectl edit deployment cluster-autoscaler -n kube-system
+
+Replace <Cluset Name> with your Cluster Name
+
+spec:
+  containers:
+  - name: cluster-autoscaler
+    args:
+      - --cloud-provider=aws
+      - --nodes=1:10:eks-inxClusterNodeGroup-80c956c7-b276-aca3-b941-013eff42c17f  # Specify min and max node count, and your node group name
+      - --balance-similar-node-groups
+      - --skip-nodes-with-system-pods=false
+      - --skip-nodes-with-local-storage=false
+
+Annotate the Cluster Autoscaler deployment to avoid evicting itself:
+kubectl annotate deployment cluster-autoscaler -n kube-system cluster-autoscaler.kubernetes.io/safe-to-evict="false"
+
+aws autoscaling update-auto-scaling-group \
+  --auto-scaling-group-name eks-inxClusterNodeGroup-80c956c7-b276-aca3-b941-013eff42c17f \
+  --min-size 1 \
+  --max-size 10 \
+  --desired-capacity 2
+
+m5.large (2 vCPU, 8 GB RAM): Suitable for small to medium-sized applications with moderate traffic and job processing needs.
+m5.xlarge (4 vCPU, 16 GB RAM): A good option for handling more traffic or complex Sidekiq jobs. Provides a balance of CPU and memory for Rails, Sidekiq, and Istio overhead.
+m5.2xlarge (8 vCPU, 32 GB RAM): Ideal for larger applications with high traffic and heavy background job processing, especially if you're running many Rails and Sidekiq pods per node.
+
+
+m5.large or m5.xlarge for a balanced option (moderate workloads).
+c5.large or c5.xlarge for Sidekiq-heavy, compute-intensive jobs.
+r5.large or r5.xlarge for memory-intensive workloads.
+
+
+aws eks list-nodegroups --cluster-name inx
+aws eks describe-nodegroup --cluster-name inx --nodegroup-name inxNodeGroup
+
+
+aws eks create-nodegroup \
+  --cluster-name inx \
+  --nodegroup-name inx-m5-Large-NodeGroup \
+  --scaling-config minSize=1,maxSize=5,desiredSize=1 \
+  --instance-types m5.large \
+  --node-role arn:aws:iam::741448962015:role/eksctl-inx-nodegroup-inxNodeGroup-NodeInstanceRole-QTp6osmtzatb \
+  --subnets subnet-0e11a7b31941ff750 subnet-0ba0c199ce1e7e0e8 subnet-031d4417bf3faa299 subnet-01c3ca774d7926162 subnet-06ee23cb13c57ca69 subnet-085949ceac9da8bb7 \
+  --ami-type AL2_x86_64
+
+
+kubectl get nodes
+NAME                                             STATUS   ROLES    AGE     VERSION
+ip-192-168-116-237.ap-south-1.compute.internal   Ready    <none>   2m47s   v1.30.4-eks-a737599
+ip-192-168-18-241.ap-south-1.compute.internal    Ready    <none>   17m     v1.30.4-eks-a737599
+ip-192-168-92-135.ap-south-1.compute.internal    Ready    <none>   39h     v1.30.4-eks-a737599
+
+kubectl drain ip-192-168-18-241.ap-south-1.compute.internal --ignore-daemonsets --delete-emptydir-data
+
+kubectl drain ip-192-168-92-135.ap-south-1.compute.internal --ignore-daemonsets --delete-emptydir-data
+
+aws eks delete-nodegroup --cluster-name inx --nodegroup-name inxNodeGroup
+
+
+RAILS_ENV=development bundle exec puma -C config/puma.rb
+
+
+kubectl run -i --tty busybox --image=busybox --restart=Never -- sh

@@ -3,7 +3,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :data
+      resources :data do
+        collection do
+          get :exception
+        end
+      end
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -16,6 +20,20 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
+
+  require 'sidekiq/web'
+
+  Sidekiq::Web.use Rack::Auth::Basic, "Protected Area" do |username, password|
+    username == ENV['SIDEKIQ_USERNAME'] && password == ENV['SIDEKIQ_PASSWORD']
+  end
+
+  Rails.application.routes.draw do
+    mount Sidekiq::Web => '/sidekiq'
+  end
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # Route Globbing
+  get 'photos/*other', to: 'application#not_found'
+  get '*unmatched_route', to: 'application#not_found'
 end

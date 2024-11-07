@@ -62,3 +62,7 @@ gem 'redis'
 
 gem "searchkick"
 gem "elasticsearch"
+
+gem 'sidekiq'
+
+# gem 'rack', '3.1.7'

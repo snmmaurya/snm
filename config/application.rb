@@ -26,7 +26,11 @@ module Snm
     #
     # config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("app", "services")
+    config.eager_load_paths << Rails.root.join("lib")
+    config.autoload_paths << Rails.root.join("lib")
 
     config.middleware.use ChangeResponseHeadersMiddleware
+
+    config.active_job.queue_adapter = :sidekiq
   end
 end

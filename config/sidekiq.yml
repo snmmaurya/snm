@@ -1,0 +1,24 @@
+# config/sidekiq.yml
+---
+:concurrency: 5  # Number of threads per process
+:queues:
+  - default
+  - mailers
+  - critical
+
+# Here, :concurrency: 5 means that Sidekiq will process up to 5 jobs concurrently per worker.
+# If you have 3 queues (a, b, c), each with 20 jobs and you set :concurrency: 5, Sidekiq will pick up a total of 5 jobs to run concurrently from any queue. It does not allocate 5 jobs per queue. Instead, it picks jobs from the queues according to the priority or the order in which the jobs are pushed into the queue.
+
+
+# # config/sidekiq.yml
+# :queues:
+#   - critical    # highest priority
+#   - default     # second priority
+#   - low         # lowest priority
+
+
+# # config/sidekiq.yml
+# :queues:
+#   - [critical, 5]  # 5x priority
+#   - [default, 3]   # 3x priority
+#   - [low, 1]       # 1x priority
