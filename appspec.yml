@@ -1,0 +1,31 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ec2-user/snm
+hooks:
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 300
+  DownloadBundle:
+    - location: scripts/sample.sh
+      timeout: 300
+  BeforeInstall:
+    - location: scripts/configure_master_key.sh
+      timeout: 300
+    - location: scripts/bundle_install.sh
+      timeout: 300
+    - location: scripts/database_configuration.sh
+      timeout: 300
+  Install:
+    - location: scripts/sample.sh
+      timeout: 300
+  AfterInstall:
+    - location: scripts/sample.sh
+      timeout: 300
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 300
+  ValidateService:
+    - location: scripts/sample.sh
+      timeout: 300

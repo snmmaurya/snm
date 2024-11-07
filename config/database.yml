@@ -2,10 +2,10 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: <%= Rails.application.credentials.dig(:database, :development, :DB_USERNAME) %>
-  password: <%= Rails.application.credentials.dig(:database, :development, :DB_PASSWORD) %>
-  host: <%= Rails.application.credentials.dig(:database, :development, :DB_HOST) %>
-  database: <%= Rails.application.credentials.dig(:database, :development, :DB_NAME) %>
+  username: <%= Rails.application.credentials.dig(:development, :DATABASE, :DB_USERNAME) %>
+  password: <%= Rails.application.credentials.dig(:development, :DATABASE, :DB_PASSWORD) %>
+  host: <%= Rails.application.credentials.dig(:development, :DATABASE, :DB_HOST) %>
+  database: <%= Rails.application.credentials.dig(:development, :DATABASE, :DB_NAME) %>
   port: 5432
 
 development:
@@ -16,7 +16,7 @@ test:
 
 production:
   <<: *default
-  username: <%= Rails.application.credentials.dig(:database, :production, :DB_USERNAME) %>
-  password: <%= Rails.application.credentials.dig(:database, :production, :DB_PASSWORD) %>
-  host: <%= Rails.application.credentials.dig(:database, :production, :DB_HOST) %>
-  database: <%= Rails.application.credentials.dig(:database, :production, :DB_NAME) %>
+  username: <%= Rails.application.credentials.dig(:production, :DATABASE, :DB_USERNAME) %>
+  password: <%= Rails.application.credentials.dig(:production, :DATABASE, :DB_PASSWORD) %>
+  host: <%= Rails.application.credentials.dig(:production, :DATABASE, :DB_HOST) %>
+  database: <%= Rails.application.credentials.dig(:production, :DATABASE, :DB_NAME) %>
