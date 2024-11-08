@@ -17,10 +17,10 @@ hooks:
       timeout: 300
     - location: scripts/bundle_install.sh
       timeout: 300
+  Install:
     - location: scripts/database_configuration.sh
       timeout: 300
-  Install:
-    - location: scripts/sample.sh
+    - location: scripts/assets_precompile.sh
       timeout: 300
   AfterInstall:
     - location: scripts/sample.sh
