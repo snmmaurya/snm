@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
 
   Sidekiq::Web.use Rack::Auth::Basic, "Protected Area" do |username, password|
-    username == ENV['SIDEKIQ_USERNAME'] && password == ENV['SIDEKIQ_PASSWORD']
+    username == Rails.application.credentials.dig(:SIDEKIQ, :SIDEKIQ_USERNAME) && password == Rails.application.credentials.dig(:SIDEKIQ, :SIDEKIQ_PASSWORD)
   end
 
   Rails.application.routes.draw do
