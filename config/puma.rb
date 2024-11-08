@@ -16,7 +16,7 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # Specifies the number of worker processes to use.
 # This will fork workers from the main Puma process. If you're using a multi-core server, workers allow you to run Rails in parallel.
 # Workers are useful when handling high-concurrency, high-throughput requests.
-workers ENV.fetch("WEB_CONCURRENCY") { 1 }
+workers ENV.fetch("WEB_CONCURRENCY") { 0 }
 
 # Preload the application before forking worker processes.
 # This saves memory and can speed up application startup, but workers cannot share connections to external services (like the database).
